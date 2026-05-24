@@ -3,31 +3,39 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>KOICA-TIU Hackathon Sample</title>
+    <title>CV Feedback Bot — KOICA-TIU Hackathon Example</title>
     <link rel="stylesheet" href="/static/style.css" />
   </head>
   <body>
     <main class="shell">
       <section class="panel">
-        <p class="eyebrow">KOICA-TIU 2026 Hackathon</p>
-        <h1>Azure AI project starter</h1>
-        <form id="ask-form">
-          <label for="question">Question</label>
+        <p class="eyebrow">KOICA-TIU 2026 · Career CV Example</p>
+        <h1>CV Feedback Bot</h1>
+        <p class="hint">
+          Paste a CV (English) and receive structured feedback in three lists:
+          strengths, weaknesses, and concrete suggestions. Private contact
+          numbers will be flagged as red flags so you can remove them before
+          sharing the CV publicly.
+        </p>
+        <form id="review-form">
+          <label for="cv">CV text</label>
           <textarea
-            id="question"
-            name="question"
-            rows="7"
-            placeholder="Example: Generate 5 demo questions for a first-year campus FAQ assistant."
+            id="cv"
+            name="cv"
+            rows="10"
+            placeholder="Paste the CV here. Minimum 20 characters."
           ></textarea>
-          <button type="submit">Ask</button>
+          <button type="submit" id="submit-btn">Review CV</button>
         </form>
       </section>
       <section class="panel result-panel">
         <div class="result-head">
-          <h2>Response</h2>
+          <h2>Feedback</h2>
           <span id="mode">ready</span>
         </div>
-        <pre id="answer">Ask a question to test the sample app.</pre>
+        <div id="result" class="result">
+          <p class="placeholder">Submit a CV to see structured feedback here.</p>
+        </div>
       </section>
     </main>
     <script src="/static/app.js"></script>

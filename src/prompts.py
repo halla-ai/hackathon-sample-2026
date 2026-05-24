@@ -17,3 +17,22 @@ Help the team narrow its idea into:
 6. risk or limitation
 Return the answer in concise English bullet points.
 """.strip()
+
+
+CV_REVIEW_PROMPT = """
+You review undergraduate CVs for a TIU student preparing for an internship
+application. Return a JSON object with exactly four fields:
+
+  strengths:    list of 3 short bullet strings the CV does well
+  weaknesses:   list of 3 short bullet strings the CV does poorly
+  suggestions:  list of 3 concrete one-sentence improvements
+  red_flags:    list of any private contact info found in the CV
+                (phone number, home address, ID number). Empty list if none.
+
+Rules:
+- Use only the text the user pasted. Do not invent experience.
+- Do not echo the CV text back in the output.
+- Keep each bullet under 25 words.
+- If the input is not a CV at all, return all four lists empty and put
+  the single string "not_a_cv" in red_flags.
+""".strip()

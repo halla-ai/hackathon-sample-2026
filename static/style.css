@@ -131,6 +131,68 @@ pre {
   font: 15px/1.6 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
+.hint {
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.result {
+  min-height: 320px;
+  display: grid;
+  gap: 18px;
+}
+
+.result .placeholder,
+.result .empty,
+.result .error {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.result .error {
+  color: #b91c1c;
+}
+
+.result-block {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.result-block h3 {
+  margin: 0 0 8px;
+  color: var(--accent-dark);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.result-block ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.result-block li + li {
+  margin-top: 4px;
+}
+
+.result-block--flag {
+  background: #fef3c7;
+  border-color: #fbbf24;
+}
+
+.result-block--flag h3 {
+  color: #92400e;
+}
+
 @media (max-width: 820px) {
   .shell {
     min-height: auto;

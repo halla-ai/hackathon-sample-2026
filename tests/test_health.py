@@ -15,7 +15,7 @@ def test_health() -> None:
 def test_index_returns_static_ui() -> None:
     response = client.get("/")
     assert response.status_code == 200
-    assert "Azure AI project starter" in response.text
+    assert "CV Feedback Bot" in response.text
     assert 'lang="en"' in response.text
 
 
@@ -47,6 +47,7 @@ def test_tracked_text_is_english_only() -> None:
         "docs/QUICKSTART.md",
         "docs/TROUBLESHOOTING.md",
         "docs/TUTOR_REVIEW.md",
+        "docs/WALKTHROUGH.md",
         "src/prompts.py",
         "static/index.html",
     ]
