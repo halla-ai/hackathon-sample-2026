@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KOICA-TIU Hackathon Sample</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="panel">
+        <p class="eyebrow">KOICA-TIU 2026 Hackathon</p>
+        <h1>Azure AI project starter</h1>
+        <form id="ask-form">
+          <label for="question">Question</label>
+          <textarea
+            id="question"
+            name="question"
+            rows="7"
+            placeholder="예: 캠퍼스 신입생을 위한 AI 안내 챗봇의 첫 데모 질문 5개를 만들어줘."
+          ></textarea>
+          <button type="submit">Ask</button>
+        </form>
+      </section>
+      <section class="panel result-panel">
+        <div class="result-head">
+          <h2>Response</h2>
+          <span id="mode">ready</span>
+        </div>
+        <pre id="answer">Ask a question to test the sample app.</pre>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
