@@ -1,5 +1,20 @@
 # Project Ideas
 
+Each track below has a deep-dive page on the public site with full architecture,
+prompt pack, code snippet, demo screens, Azure budget estimate, and pitfalls:
+
+| Track | Public deep-dive |
+|---|---|
+| Campus FAQ RAG | <https://koica-tiu.halla.ai/hackathon/samples/education-faq> |
+| Internship / CV | <https://koica-tiu.halla.ai/hackathon/samples/career-cv> |
+| Public Service | <https://koica-tiu.halla.ai/hackathon/samples/public-service> |
+| Tourism Planner | <https://koica-tiu.halla.ai/hackathon/samples/tourism> |
+| Business Brief | <https://koica-tiu.halla.ai/hackathon/samples/business> |
+| Real Estate | <https://koica-tiu.halla.ai/hackathon/samples/realestate> |
+
+Read the deep-dive before you start coding — it tells you which Azure services
+to use, what the architecture should look like, and the common pitfalls.
+
 ## 1. Campus FAQ RAG
 
 - User: first-year TIU students

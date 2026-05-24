@@ -2,6 +2,10 @@
 
 Use this file as the team's operating checklist on June 20.
 
+> See also: <https://koica-tiu.halla.ai/hackathon/d-day> (student first-30-minute path + tutor hot-paths) ·
+> <https://koica-tiu.halla.ai/hackathon/judging> (rubric) ·
+> <https://koica-tiu.halla.ai/hackathon/submission> (slide + README templates)
+
 ## First 30 Minutes
 
 1. Sit with your assigned team and confirm the tutor name.

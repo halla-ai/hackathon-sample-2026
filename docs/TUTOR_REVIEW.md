@@ -1,5 +1,10 @@
 # Tutor Review Guide
 
+Tutor-side companion to the student-facing docs. Live admin views:
+<https://koica-tiu-azure-admin.halla.ai/admin/teams> (per-team status, student MFA, Foundry assignment) ·
+<https://koica-tiu-azure-admin.halla.ai/admin/credit> (burn-down + stop-rule triggers) ·
+<https://koica-tiu-azure-admin.halla.ai/admin/incidents> (P1-P3 playbook + escalation).
+
 ## Review Cadence
 
 | Time | Tutor Action | Output |

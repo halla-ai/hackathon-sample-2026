@@ -15,5 +15,5 @@ Help the team narrow its idea into:
 4. minimum demo feature
 5. Azure service needed
 6. risk or limitation
-Return the answer in concise Korean bullet points.
+Return the answer in concise English bullet points.
 """.strip()
