@@ -79,7 +79,7 @@ App Service does not auto-detect FastAPI. Tell it how to start.
    - Stack: **Python**
    - Major version: **Python 3.11** (or 3.12 if available)
    - Minor version: latest
-3. **Startup Command**: `uvicorn src.main:app --host 0.0.0.0 --port 8000`
+3. **Startup Command**: `python -m uvicorn src.main:app --host 0.0.0.0 --port 8000`
 4. Click **Save**.
 
 ### CLI
@@ -88,9 +88,21 @@ App Service does not auto-detect FastAPI. Tell it how to start.
 az webapp config set \
   --resource-group rg-hackathon-teamXX \
   --name app-koicatiu-teamXX \
-  --startup-file "uvicorn src.main:app --host 0.0.0.0 --port 8000" \
+  --startup-file "python -m uvicorn src.main:app --host 0.0.0.0 --port 8000" \
   --linux-fx-version "PYTHON|3.11"
 ```
+
+---
+
+## Do not deploy yet if
+
+- The app does not run locally in mock mode.
+- `/health` does not return `{"status":"ok"}` locally.
+- `.env` is visible in `git status`.
+- Your tutor has not confirmed the assigned App Service and Foundry project.
+- Your team cannot explain what the first demo question will be.
+
+Fix these first. Deploying a broken app wastes time and makes debugging harder.
 
 ---
 
@@ -156,6 +168,12 @@ curl -sS -X POST "$APP_URL/ask" \
   -H "Content-Type: application/json" \
   -d '{"question":"What can you help with?"}'
 ```
+
+Expected `/ask` result:
+
+- `mode` is `azure` when all `AZURE_OPENAI_*` settings are present and correct.
+- `mode` is `mock` when settings are missing. This means the app runs, but Azure is not connected.
+- An error mentioning `401`, `403`, or `DeploymentNotFound` usually means the endpoint, key, deployment name, or role assignment is wrong.
 
 If any step fails, open **App Service** → **Log stream** (left menu) to see the runtime logs. Common errors are in [TROUBLESHOOTING.md](TROUBLESHOOTING.md) #8 and #9.
 

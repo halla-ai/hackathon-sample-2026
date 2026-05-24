@@ -16,6 +16,17 @@ Use this file as the team's operating checklist on June 20.
 6. Add Azure endpoint, deployment, and key to `.env` only after the tutor confirms the team scope.
 7. Run one short model call and save one backup screenshot.
 
+### First-30-minute exit criteria
+
+Show your tutor these four items before moving into full build mode:
+
+- The local app opens at `http://127.0.0.1:8000`.
+- `/health` returns `{"status":"ok"}`.
+- One mock-mode answer is visible in the UI.
+- The team can explain one target user and one prepared demo question.
+
+If any item is missing, keep working in mock mode and do not spend Azure tokens yet.
+
 ## Team Roles
 
 | Role | Responsibility |
@@ -24,6 +35,16 @@ Use this file as the team's operating checklist on June 20.
 | Prompt/data lead | Prepares the context, prompt, test questions, and safety checks. |
 | Foundry/backend lead | Connects Azure OpenAI or Foundry and keeps `.env` out of Git. |
 | Frontend/demo lead | Builds the visible flow, screenshots, and backup demo path. |
+
+## Tutor Checkpoints
+
+| Time | What the team shows | Tutor decision |
+|---|---|---|
+| T+30 min | mock-mode UI, `/health`, one target user, one demo question | approve Azure connection or keep mock mode |
+| Midpoint | one working API/UI flow, prompt draft, two test questions | reduce scope or approve polish |
+| Demo prep | 3-minute script, backup screenshot/video, no secrets on screen | approve final presentation |
+
+Students should not wait silently when blocked. If a checkpoint is at risk, show the current error to the tutor immediately.
 
 ## Submission Checklist
 
@@ -53,3 +74,13 @@ Use this file as the team's operating checklist on June 20.
 4. We used Azure/Foundry for ...
 5. The demo result is ...
 6. The limitation and next step are ...
+
+## Final 10 Minutes
+
+Before presentations begin:
+
+- Close any scripts that repeatedly call Azure.
+- Save one final screenshot or short screen recording.
+- Confirm the App Service URL or local backup route.
+- Hide `.env`, Azure portal keys, and browser tabs containing secrets.
+- Put the 5-slide deck and demo URL in one easy-to-open place.
