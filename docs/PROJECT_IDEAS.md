@@ -52,3 +52,24 @@
 
 Pick the idea that can show a working screen in one day. A small complete demo
 is better than a broad concept without a real user flow.
+
+## MVP Rule
+
+For any idea, the minimum viable demo is:
+
+1. One input screen or form.
+2. One Azure OpenAI or Foundry model call.
+3. One visible result that helps the target user decide or act.
+4. One safety sentence explaining what the system cannot do.
+5. One backup screenshot in case the live demo fails.
+
+## Fast Variations
+
+| Base idea | Easy variation | Harder variation |
+|---|---|---|
+| Campus FAQ RAG | Ask questions from one FAQ file | Add multilingual answers with source titles |
+| Internship Matching | Compare one profile to three roles | Add ranking explanation and skill-gap plan |
+| Public Service Explainer | Rewrite one notice into plain language | Add uncertainty labels and next-step checklist |
+| Tourism Planner | Plan a half-day itinerary | Add budget and accessibility constraints |
+| Business Brief | Generate a one-page brief | Add risk scoring and pitch outline |
+| Real Estate Assistant | Compare two listings | Add red-flag detection and budget calculator |

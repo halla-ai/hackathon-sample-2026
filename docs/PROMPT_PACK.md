@@ -3,6 +3,39 @@
 아래 프롬프트는 해커톤 팀이 그대로 복사해서 아이디어 구체화, 구현, 평가에
 사용할 수 있도록 작성한 예시다. 팀 주제에 맞게 대괄호 부분만 바꾼다.
 
+Start with the English prompts if your team is presenting in English. Use the
+Korean prompts when you want more detailed planning help.
+
+## 0. Fast English Prompts
+
+### Scope the project
+
+```text
+We are a KOICA-TIU Azure AI hackathon team.
+Our idea is: [idea].
+Help us define one target user, one concrete problem, one demo screen,
+one Azure or Foundry workflow, and one risk we must avoid.
+Keep the scope small enough for one day.
+```
+
+### Review the demo
+
+```text
+Act as our hackathon tutor.
+Review this 3-minute demo plan:
+[demo plan]
+Find the riskiest step, one backup option, and one sentence that explains
+how Azure or Microsoft Foundry is used.
+```
+
+### Reduce cost
+
+```text
+Review this prototype flow and suggest how to reduce Azure token use,
+repeated model calls, and unnecessary app runtime without weakening the demo:
+[flow]
+```
+
 ## 1. 프로젝트 아이디어 좁히기
 
 ```text
@@ -110,4 +143,20 @@ AI 출력: [output]
 - 데모 화면: [demo]
 
 가장 먼저 고쳐야 할 3가지와 발표 전에 확인할 체크리스트를 알려줘.
+```
+
+## 10. 5-slide deck outline
+
+```text
+Create a 5-slide hackathon deck outline for this project:
+[project]
+
+Slides:
+1. Problem and target user
+2. Proposed solution
+3. Azure or Foundry workflow
+4. Demo result
+5. Limitation and next step
+
+Use short bullet points suitable for a 3-minute presentation.
 ```

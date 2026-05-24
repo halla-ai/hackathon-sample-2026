@@ -6,6 +6,12 @@ FastAPI backend, static frontend, prompt examples, and deployment notes.
 
 ## Quick Start
 
+Use this order during the hackathon:
+
+1. Start in mock mode so the UI and README are ready before spending Azure quota.
+2. Add the assigned Azure values to `.env`.
+3. Run one short model call and save a backup screenshot.
+
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
@@ -42,7 +48,16 @@ docs/PROMPT_PACK.md  copy-paste prompts for teams
 docs/PROJECT_IDEAS.md starter project ideas
 docs/AZURE_DEPLOY.md Azure setup and deployment checklist
 docs/TUTOR_REVIEW.md tutor review rubric and coaching flow
+docs/HACKATHON_DAY.md first 30 minutes, roles, submission checklist
 ```
+
+## Build Paths
+
+| Path | Target |
+|---|---|
+| 30 minutes | Run mock mode, rename the project, define one user, prepare one demo question. |
+| 2 hours | Connect Azure OpenAI, add a small public or synthetic context, show one complete user flow. |
+| One day | Polish the UI, add evaluation questions, prepare backup screenshots, rehearse the 3-minute demo. |
 
 ## Team Workflow
 
@@ -51,6 +66,14 @@ docs/TUTOR_REVIEW.md tutor review rubric and coaching flow
 3. Add 5-10 sample questions for your target user.
 4. Test the response quality with `docs/PROMPT_PACK.md`.
 5. Prepare a 3-minute demo: problem, user flow, Azure service, result, next step.
+6. Ask your tutor to review the project with `docs/TUTOR_REVIEW.md`.
+
+## Required Submission
+
+- Team repository with source code, README, `.env.example`, and no real secrets.
+- 5-slide deck: problem, user, Azure workflow, demo result, limitation/next step.
+- Demo link or backup screenshots/video.
+- Short cost note explaining which Azure services were used.
 
 ## Cost Guardrails
 
