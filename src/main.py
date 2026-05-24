@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Optional
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
@@ -19,7 +20,7 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 class QuestionRequest(BaseModel):
     question: str = Field(..., min_length=2, max_length=2000)
-    system_prompt: str | None = Field(default=None, max_length=4000)
+    system_prompt: Optional[str] = Field(default=None, max_length=4000)
 
 
 class AnswerResponse(BaseModel):
