@@ -6,6 +6,8 @@ The sample is intentionally minimal: FastAPI backend, static frontend, a single 
 
 > **Full guides on the public site**: [Build paths](https://koica-tiu.halla.ai/hackathon/build-paths) · [Sample tracks](https://koica-tiu.halla.ai/hackathon/samples) · [D-Day flow](https://koica-tiu.halla.ai/hackathon/d-day) · [Judging](https://koica-tiu.halla.ai/hackathon/judging) · [Submission](https://koica-tiu.halla.ai/hackathon/submission)
 
+> 🚀 **Working example**: A complete end-to-end deploy example (CV Feedback Bot → Azure Container Apps, ~₩900 per team) lives on the [`example/career-cv`](https://github.com/halla-ai/hackathon-sample-2026/tree/example/career-cv) branch. The full step-by-step walkthrough is in [`example/career-cv/docs/WALKTHROUGH.md`](https://github.com/halla-ai/hackathon-sample-2026/blob/example/career-cv/docs/WALKTHROUGH.md), also summarized at [koica-tiu.halla.ai/hackathon/walkthrough](https://koica-tiu.halla.ai/hackathon/walkthrough).
+
 ---
 
 ## Prerequisites
