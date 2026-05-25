@@ -35,8 +35,7 @@ log() {
 }
 
 run() {
-  printf '+ %q' "$1"
-  shift
+  printf '+'
   for arg in "$@"; do
     printf ' %q' "$arg"
   done
