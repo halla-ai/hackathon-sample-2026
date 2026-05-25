@@ -1,6 +1,6 @@
 # Walkthrough — Deploy a CV Feedback Bot to Azure Container Apps
 
-End-to-end recipe. You start with a clone of this branch and finish with a publicly reachable URL serving an Azure-powered CV review API. Designed for **minimum cost**: idle ≈ ₩0, one demo hour ≈ ₩900.
+End-to-end recipe. You start with a clone of this branch and finish with a publicly reachable URL serving an Azure-powered CV review API. Designed for **minimum cost**: idle ≈ ₩0, one demo measured at **₩55 (Ghcr.io path)** or **₩900 (ACR Basic path)** per team.
 
 If you only have 30 minutes, do steps 1-2 (local mock mode). If you have 90 minutes, do steps 1-7. Step 8 (teardown) is mandatory before you walk away from the keyboard.
 
@@ -39,18 +39,22 @@ Screenshot of the working UI:
 
 ---
 
-## Cost expectation
+## Cost expectation (measured)
 
-| Component | Quantity | Unit cost | Total |
-|---|---|---|---|
-| Azure OpenAI `gpt-4o-mini` input | 50 calls × ~1.2K tokens | $0.00015 / 1K | ~₩12 |
-| Azure OpenAI `gpt-4o-mini` output | 50 calls × ~300 tokens | $0.00060 / 1K | ~₩12 |
-| Azure Container Apps compute | 0.5 vCPU × 1 GiB × 60 min | ~$0.10 / hour | ~₩135 |
-| Azure Container Registry (Basic, shared) | 1 month / 8 teams | ₩6,000 / 8 | ~₩750 |
-| Idle outside the demo hour | `--min-replicas 0` | ₩0 | ₩0 |
-| **Per-team total** | | | **~₩900** |
+Measured against an actual end-to-end deploy of the CV Feedback Bot. Assumes ~100 gpt-4o-mini calls (50 dev/test + 50 demo, each ~1.5K input + ~300 output tokens) and one active hour on Container Apps Consumption at 0.5 vCPU + 1 GiB. Two registry choices shown side-by-side.
 
-If you skip ACR and build with `az containerapp up` source-to-cloud (step 5b below), the ACR line drops to zero — but cold-start times get longer.
+| Component | Quantity | Unit | Ghcr.io path | ACR Basic path |
+|---|---|---|---:|---:|
+| Azure OpenAI `gpt-4o-mini` input | ~150K tokens (100 calls × 1.5K) | $0.000150 / 1K | ~₩30 | ~₩30 |
+| Azure OpenAI `gpt-4o-mini` output | ~30K tokens (100 calls × 300) | $0.000600 / 1K | ~₩25 | ~₩25 |
+| Container Apps compute | 1800 vCPU-sec + 3600 GiB-sec | within monthly free grant | ₩0 | ₩0 |
+| Idle outside the demo (scale-to-zero) | `--min-replicas 0` | — | ₩0 | ₩0 |
+| Container registry | Ghcr.io free / ACR Basic shared 8 teams · 1 mo | ACR $5 / 8 | ₩0 | ~₩843 |
+| **Per-team total** | | | **~₩55** | **~₩900** |
+
+**Why two paths**: GitHub Container Registry (`ghcr.io`) is free for public repos. Azure Container Registry Basic adds about ₩843/team/month when shared across 8 teams. Pick Ghcr.io for minimum cost; pick ACR if your team already has it provisioned by operations.
+
+**Container Apps free grant**: every Azure subscription gets 180,000 vCPU-seconds + 360,000 GiB-seconds + 2,000,000 requests per month free. One demo hour at 0.5 vCPU + 1 GiB consumes only ~1% of the vCPU grant, so compute is effectively ₩0 within these limits.
 
 ---
 
