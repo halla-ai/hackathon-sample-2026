@@ -23,6 +23,11 @@ log "Ensuring Azure OpenAI resource"
 if resource_exists az cognitiveservices account show --name "$OPENAI_NAME" --resource-group "$RG"; then
   echo "Azure OpenAI resource exists: $OPENAI_NAME"
 else
+  echo "Purging any soft-deleted Azure OpenAI account with the same name."
+  az cognitiveservices account purge \
+    --name "$OPENAI_NAME" \
+    --resource-group "$RG" \
+    --location "$LOCATION" >/dev/null 2>&1 || true
   run az cognitiveservices account create \
     --name "$OPENAI_NAME" \
     --resource-group "$RG" \

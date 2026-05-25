@@ -189,6 +189,8 @@ Delete everything for the suffix:
 bash scripts/delete_career_cv_aca.sh
 ```
 
+The delete script also attempts to purge the soft-deleted Azure OpenAI account name. This matters when you retry the same suffix during practice.
+
 The deploy script writes `.azure/career-cv-demo-$SUFFIX.env` with non-secret values such as `APP_URL` and `RESOURCE_GROUP`. It does not write the Azure OpenAI key.
 
 ### GitHub Actions path
@@ -461,6 +463,7 @@ az group delete --name $RG --yes --no-wait
 ```
 
 `az group delete --no-wait` returns immediately; the actual cleanup runs in the background for ~5 minutes.
+The provided `scripts/delete_career_cv_aca.sh` additionally purges the Azure OpenAI soft-delete record so the same suffix can be reused.
 
 Verify after a few minutes:
 
