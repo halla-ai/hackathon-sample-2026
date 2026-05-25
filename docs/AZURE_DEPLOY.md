@@ -201,7 +201,7 @@ After the hackathon, **stop your App Service** before you leave. The operations 
 | Component | Cost | Notes |
 |---|---|---|
 | App Service B1 | ≈ ₩52,500 / month if always on | Stop the slot when you are not demoing — costs drop to near zero |
-| Azure OpenAI (GPT-4.1) | $0.005 / 1K input, $0.015 / 1K output | Hackathon day target: under 50K tokens per team |
+| Azure OpenAI (gpt-4o-mini) | About $0.165 input + $0.66 output per 1M tokens | Use the deployment assigned by tutors |
 | Storage (logs) | < ₩1,000 / month | Negligible for hackathon usage |
 
 Per-team budget on D-day: **₩375,000** (cap). The credit-safety details are at <https://koica-tiu.halla.ai/azure-lab>.

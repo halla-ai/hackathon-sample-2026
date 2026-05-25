@@ -137,7 +137,7 @@ Edit `.env`:
 ```dotenv
 AZURE_OPENAI_ENDPOINT=https://koicatiu-team05.openai.azure.com/
 AZURE_OPENAI_API_KEY=<paste-from-tutor>
-AZURE_OPENAI_DEPLOYMENT=gpt-4-1
+AZURE_OPENAI_DEPLOYMENT=gpt-4o-mini
 AZURE_OPENAI_API_VERSION=2024-12-01-preview
 ```
 

@@ -108,7 +108,7 @@ uvicorn src.main:app --reload
 
 **Fix**:
 1. Open Foundry → your project → Models + endpoints.
-2. Copy the exact deployment name (case-sensitive). Common names: `gpt-4-1`, `gpt-4o-mini`, `gpt-35-turbo`.
+2. Copy the exact deployment name (case-sensitive). For the current hackathon setup, expect `gpt-4o-mini` unless tutors announce another shared deployment.
 3. Paste into `.env` exactly, restart server.
 
 ---

@@ -8,6 +8,8 @@ The sample is intentionally minimal: FastAPI backend, static frontend, a single 
 
 > 🚀 **Working example**: A complete end-to-end deploy example (CV Feedback Bot → Azure Container Apps, ~₩900 per team) lives on the [`example/career-cv`](https://github.com/halla-ai/hackathon-sample-2026/tree/example/career-cv) branch. The full step-by-step walkthrough is in [`example/career-cv/docs/WALKTHROUGH.md`](https://github.com/halla-ai/hackathon-sample-2026/blob/example/career-cv/docs/WALKTHROUGH.md), also summarized at [koica-tiu.halla.ai/hackathon/walkthrough](https://koica-tiu.halla.ai/hackathon/walkthrough).
 
+> **Technique showcase**: The `main` branch now includes five standalone scaffolds under [`src/techniques/`](src/techniques/) for agent orchestration, embeddings search, vision input, streaming, and evaluation. Start with [`docs/TECHNIQUES.md`](docs/TECHNIQUES.md) to choose the right pattern and link it back to the public sample pages.
+
 ---
 
 ## Prerequisites
@@ -87,6 +89,7 @@ src/
   main.py            FastAPI app, routes /, /health, /ask
   ai_client.py       Azure OpenAI client + mock fallback
   prompts.py         DEFAULT_SYSTEM_PROMPT + PROJECT_COACH_PROMPT
+  techniques/        standalone technique scaffolds, each runnable in mock mode
   __init__.py
 static/
   index.html         single-page UI (textarea + response panel)
@@ -94,8 +97,9 @@ static/
   style.css          minimal styling
 docs/
   QUICKSTART.md         first-time setup walkthrough with expected output
+  TECHNIQUES.md         catalog for the five technique scaffolds
   PROMPT_PACK.md        copy-paste prompts for ideation, RAG, evaluation, pitch
-  PROJECT_IDEAS.md      six starter project ideas with MVP rules
+  PROJECT_IDEAS.md      six public-sample-aligned ideas with MVP rules
   AZURE_DEPLOY.md       Azure AI Foundry setup + App Service deployment
   CONTAINER_APPS.md     Azure Container Apps deployment alternative
   TROUBLESHOOTING.md    common errors, symptom → cause → fix
@@ -146,13 +150,12 @@ Goal: a working assistant for one task with your team's prompt and data.
 Goal: a leaderboard-quality submission with grounded answers, citations, and a recorded demo.
 
 1. Finish the 2-hour path.
-2. Pick one of the six [sample tracks](https://koica-tiu.halla.ai/hackathon/samples) (Education, Career, Public service, Tourism, Business, Real estate). Read its architecture and prompt pack.
-3. Upload 3-5 small public documents to your team's Foundry project (Data + indexes blade).
-4. Switch `src/ai_client.py` to pass the `data_sources` parameter so answers are grounded.
-5. Iterate on the system prompt until the response includes citation titles.
-6. Polish the UI: page title, empty state, suggested prompts.
-7. Record a 90-second screen capture of the working flow. Save to `demo/recording.mp4`.
-8. Write the 5-line risk register at the bottom of your team README (prompt injection, hallucination, privacy, cost, mitigation owner).
+2. Pick one of the six [sample tracks](https://koica-tiu.halla.ai/hackathon/samples). Read its architecture and open the matching scaffold in [`docs/TECHNIQUES.md`](docs/TECHNIQUES.md).
+3. Run that scaffold in mock mode and adapt one idea into your own project flow.
+4. Connect only the Azure services marked allowed in the [technology matrix](https://koica-tiu.halla.ai/hackathon/technology).
+5. Polish the UI: page title, empty state, suggested prompts.
+6. Record a 90-second screen capture of the working flow. Save to `demo/recording.mp4`.
+7. Write the 5-line risk register at the bottom of your team README (prompt injection, hallucination, privacy, cost, mitigation owner).
 
 **Expected token use**: 200K-400K tokens (≈ ₩10,000-20,000). **Deliverable**: live demo + recording + 5-slide deck + README.
 
@@ -161,11 +164,12 @@ Goal: a leaderboard-quality submission with grounded answers, citations, and a r
 ## Team Workflow
 
 1. Pick one project idea ([docs/PROJECT_IDEAS.md](docs/PROJECT_IDEAS.md)) and one target user.
-2. Replace `DEFAULT_SYSTEM_PROMPT` in `src/prompts.py`.
-3. Add 5-10 sample questions for your target user (save to `docs/SAMPLE_QUESTIONS.md` if you want them under version control).
-4. Test response quality with prompts from [docs/PROMPT_PACK.md](docs/PROMPT_PACK.md).
-5. Rehearse a 3-minute demo following the structure: problem → user → demo flow → Azure use → impact → next step.
-6. Run your tutor through the [docs/TUTOR_REVIEW.md](docs/TUTOR_REVIEW.md) rubric before the final pitch.
+2. Choose one technique scaffold from [docs/TECHNIQUES.md](docs/TECHNIQUES.md).
+3. Replace `DEFAULT_SYSTEM_PROMPT` in `src/prompts.py` only if your main app needs a different role.
+4. Add 5-10 sample questions for your target user (save to `docs/SAMPLE_QUESTIONS.md` if you want them under version control).
+5. Test response quality with prompts from [docs/PROMPT_PACK.md](docs/PROMPT_PACK.md).
+6. Rehearse a 3-minute demo following the structure: problem -> user -> demo flow -> Azure use -> impact -> next step.
+7. Run your tutor through the [docs/TUTOR_REVIEW.md](docs/TUTOR_REVIEW.md) rubric before the final pitch.
 
 ---
 

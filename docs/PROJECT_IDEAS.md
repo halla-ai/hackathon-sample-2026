@@ -1,114 +1,86 @@
 # Project Ideas
 
-Each track below has a deep-dive page on the public site with full architecture,
-prompt pack, code snippet, demo screens, Azure budget estimate, and pitfalls:
+These six ideas match the public sample pages and the technique scaffolds in [`docs/TECHNIQUES.md`](TECHNIQUES.md). Treat them as starting points, not recipes.
 
-| Track | Public deep-dive |
-|---|---|
-| Campus FAQ RAG | <https://koica-tiu.halla.ai/hackathon/samples/education-faq> |
-| Internship / CV | <https://koica-tiu.halla.ai/hackathon/samples/career-cv> |
-| Public Service | <https://koica-tiu.halla.ai/hackathon/samples/public-service> |
-| Tourism Planner | <https://koica-tiu.halla.ai/hackathon/samples/tourism> |
-| Business Brief | <https://koica-tiu.halla.ai/hackathon/samples/business> |
-| Real Estate | <https://koica-tiu.halla.ai/hackathon/samples/realestate> |
+| Slug | Public deep-dive | Template reference |
+|---|---|---|
+| `career-cv` | <https://koica-tiu.halla.ai/hackathon/samples/career-cv> | Complete branch: `example/career-cv` |
+| `agent-triage` | <https://koica-tiu.halla.ai/hackathon/samples/agent-triage> | `src/techniques/agent_orchestration/` |
+| `semantic-recommender` | <https://koica-tiu.halla.ai/hackathon/samples/semantic-recommender> | `src/techniques/embeddings_search/` |
+| `vision-reader` | <https://koica-tiu.halla.ai/hackathon/samples/vision-reader> | `src/techniques/vision_multimodal/` |
+| `streaming-chat` | <https://koica-tiu.halla.ai/hackathon/samples/streaming-chat> | `src/techniques/streaming/` |
+| `evaluation-harness` | <https://koica-tiu.halla.ai/hackathon/samples/evaluation-harness> | `src/techniques/evaluation_harness/` |
 
-Read the deep-dive before you start coding — it tells you which Azure services
-to use, what the architecture should look like, and the common pitfalls.
+## 1. CV Feedback Bot
 
-## 1. Campus FAQ RAG
+- User: students preparing internship or scholarship applications.
+- Problem: CV feedback is slow, inconsistent, and often too generic.
+- Demo: paste a synthetic CV and receive structured strengths, weaknesses, suggestions, and privacy flags.
+- Technique: JSON-mode structured output.
+- Azure: `gpt-4o-mini` chat completion.
+- Starting point: use the complete `example/career-cv` branch when you want a full deployment reference.
+- Your version could: adapt the rubric to a specific internship track or compare a CV with a job description.
 
-- User: first-year TIU students
-- Problem: students repeatedly ask about classes, campus rules, and schedules
-- Demo: upload a small FAQ file, ask questions, answer with source titles
-- Azure: AI Foundry project, Azure OpenAI chat deployment
-- Starter data: 10-20 public FAQ rows about class times, campus rules, rooms, and contacts
-- First demo question: "Where can a first-year student ask about course registration?"
-- Minimum screen: one question box, one answer panel, and one source-title list
-- Safety note: answer only from the FAQ; if the answer is missing, say which office to contact
-- Extension: add Uzbek/English answer mode
+## 2. Multi-step Service Triage Agent
 
-## 2. Internship Matching Assistant
+- User: students who need help during the hackathon.
+- Problem: tutors receive repeated questions, but some issues need escalation.
+- Demo: ask a schedule, submission, cost, or account question and show the selected tool result.
+- Technique: agent orchestration and tool calls.
+- Azure: `gpt-4o-mini` tool calling; local mock fallback in `src/techniques/agent_orchestration/`.
+- Starting point: run `python src/techniques/agent_orchestration/example.py`.
+- Your version could: add a team-state store, a tutor queue, or a confidence threshold before escalation.
 
-- User: AI department students preparing for internships
-- Problem: students do not know which role fits their skills
-- Demo: paste a profile, receive role suggestions and learning gaps
-- Azure: Azure OpenAI prompt flow
-- Starter data: three sample job descriptions and one synthetic student profile
-- First demo question: "Which internship role fits this profile best, and what should I learn next?"
-- Minimum screen: profile input, role recommendation, skill-gap checklist
-- Safety note: do not collect passport numbers, phone numbers, addresses, or private grades
-- Extension: add CV rewrite suggestions
+## 3. Skill-Matched Recommender
 
-## 3. Public Service Explainer
+- User: students choosing a role, project, or learning path.
+- Problem: keyword search misses related skills and goals.
+- Demo: enter a student profile and return the top matching roles or project ideas with evidence.
+- Technique: embeddings and vector ranking.
+- Azure: local cosine search by default; Azure embeddings only if tutors enable a shared deployment.
+- Starting point: run `python src/techniques/embeddings_search/example.py`.
+- Your version could: combine semantic scores with explicit tags such as Python, design, data, or presentation.
 
-- User: citizens reading public notices
-- Problem: official notices are difficult to understand
-- Demo: summarize a notice into plain language and action checklist
-- Azure: Azure OpenAI, content safety review
-- Starter data: one public notice copied into a text file with title and source URL
-- First demo question: "Explain this notice in plain English and list what the citizen should do."
-- Minimum screen: notice input, plain-language summary, action checklist
-- Safety note: do not provide legal advice; direct users to the official office for final answers
-- Extension: add risk labels for uncertain parts
+## 4. Document Vision Reader
 
-## 4. Tashkent Tourism Planner
+- User: students or staff extracting information from a screenshot, form, or poster.
+- Problem: copying fields manually is slow and error-prone.
+- Demo: provide a sample image path and return structured JSON with missing fields.
+- Technique: multimodal image input to structured extraction.
+- Azure: `gpt-4o-mini` vision path; no Azure AI Vision resource required by default.
+- Starting point: run `python src/techniques/vision_multimodal/example.py`.
+- Your version could: add a confirmation screen before any extracted field is saved.
 
-- User: exchange students or visitors
-- Problem: planning a short trip requires local context
-- Demo: create a half-day itinerary based on time, budget, and interests
-- Azure: Azure OpenAI chat
-- Starter data: 8-12 public place descriptions with opening hours and approximate travel notes
-- First demo question: "Plan a 4-hour low-budget route near central Tashkent for two students."
-- Minimum screen: preferences form, itinerary, budget estimate, fallback plan
-- Safety note: mark travel times as estimates and avoid unsafe or unverified recommendations
-- Extension: connect a simple places dataset
+## 5. Real-time Streaming Chat
 
-## 5. Business Brief Generator
+- User: students practicing interviews, presentations, or tutor Q&A.
+- Problem: full-response latency makes the demo feel stalled.
+- Demo: stream a short answer token by token and show a stable output panel.
+- Technique: streaming chat completion.
+- Azure: `gpt-4o-mini` streaming; local async stream fallback in `src/techniques/streaming/`.
+- Starting point: run `python src/techniques/streaming/example.py`.
+- Your version could: add a stop button, final-answer save, or streaming progress indicator.
 
-- User: student startup teams
-- Problem: teams need quick market and customer summaries
-- Demo: generate a one-page business brief from a product idea
-- Azure: Azure OpenAI, prompt templates
-- Starter data: product idea, target customer, price assumption, and three competitor notes
-- First demo question: "Turn this startup idea into a one-page business brief for judges."
-- Minimum screen: idea form, customer segment, value proposition, risk list
-- Safety note: label all market numbers as assumptions unless a source is provided
-- Extension: add evaluation checklist for feasibility
+## 6. Evaluation Harness
 
-## 6. Real Estate Assistant
-
-- User: students looking for housing
-- Problem: listings are hard to compare
-- Demo: convert listing text into pros, cons, questions, and red flags
-- Azure: Azure OpenAI
-- Starter data: two synthetic housing listings with rent, location, and conditions
-- First demo question: "Compare these two listings and list questions I should ask before visiting."
-- Minimum screen: listing input, comparison table, red flags, follow-up questions
-- Safety note: do not rank neighborhoods by sensitive attributes or invent unavailable listing details
-- Extension: add monthly budget calculator
+- User: teams improving prompt quality before judging.
+- Problem: teams rely on one good demo question and do not test failures.
+- Demo: score an answer against a rubric and print issues plus the next test to run.
+- Technique: evaluation pipeline and LLM-as-judge pattern.
+- Azure: deterministic local rubric by default; optional `gpt-4o-mini` JSON judge.
+- Starting point: run `python src/techniques/evaluation_harness/example.py`.
+- Your version could: add five test cases covering easy, hard, refusal, safety, and cost-sensitive prompts.
 
 ## Selection Rule
 
-Pick the idea that can show a working screen in one day. A small complete demo
-is better than a broad concept without a real user flow.
+Pick the idea that can show a working screen in one day. A small complete demo is better than a broad concept without a real user flow.
 
 ## MVP Rule
 
 For any idea, the minimum viable demo is:
 
 1. One input screen or form.
-2. One Azure OpenAI or Foundry model call.
-3. One visible result that helps the target user decide or act.
+2. One visible model or local technique result.
+3. One explanation of the Azure technique used or deferred.
 4. One safety sentence explaining what the system cannot do.
 5. One backup screenshot in case the live demo fails.
-
-## Fast Variations
-
-| Base idea | Easy variation | Harder variation |
-|---|---|---|
-| Campus FAQ RAG | Ask questions from one FAQ file | Add multilingual answers with source titles |
-| Internship Matching | Compare one profile to three roles | Add ranking explanation and skill-gap plan |
-| Public Service Explainer | Rewrite one notice into plain language | Add uncertainty labels and next-step checklist |
-| Tourism Planner | Plan a half-day itinerary | Add budget and accessibility constraints |
-| Business Brief | Generate a one-page brief | Add risk scoring and pitch outline |
-| Real Estate Assistant | Compare two listings | Add red-flag detection and budget calculator |
