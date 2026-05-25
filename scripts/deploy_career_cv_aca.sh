@@ -12,6 +12,7 @@ log "Registering required resource providers"
 run az provider register --namespace Microsoft.App --wait
 run az provider register --namespace Microsoft.ContainerRegistry --wait
 run az provider register --namespace Microsoft.CognitiveServices --wait
+run az provider register --namespace Microsoft.OperationalInsights --wait
 
 log "Ensuring resource group"
 run az group create \

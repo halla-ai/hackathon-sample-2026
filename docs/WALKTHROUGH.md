@@ -247,6 +247,7 @@ MODEL_SKU_NAME=GlobalStandard          # koreacentral; many other regions use St
 az provider register --namespace Microsoft.App --wait
 az provider register --namespace Microsoft.ContainerRegistry --wait
 az provider register --namespace Microsoft.CognitiveServices --wait
+az provider register --namespace Microsoft.OperationalInsights --wait
 
 # 3b. Resource group
 az group create --name $RG --location $LOCATION
