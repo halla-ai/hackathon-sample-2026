@@ -36,7 +36,6 @@ COPY --from=builder /opt/venv /opt/venv
 WORKDIR /app
 COPY --chown=app:app src ./src
 COPY --chown=app:app static ./static
-COPY --chown=app:app README.md ./
 
 USER app
 
