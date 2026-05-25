@@ -4,6 +4,12 @@ End-to-end recipe. You start with a clone of this branch and finish with a publi
 
 If you only have 30 minutes, do steps 1-2 (local mock mode). If you have 90 minutes, do steps 1-7. Step 8 (teardown) is mandatory before you walk away from the keyboard.
 
+There are three supported deployment paths:
+
+- **Tutor/admin console**: use the KOICA-TIU Azure Admin page when operations staff need to run the demo and show the live progress.
+- **GitHub Actions**: run the `Career CV Demo` workflow when you want a reproducible cloud-side deployment without using your laptop as the deploy machine.
+- **Local Azure CLI**: run the scripts in `scripts/` or follow the manual commands below when students need to learn each Azure step.
+
 ---
 
 ## What you build
@@ -127,12 +133,94 @@ pytest tests/
 Expected:
 
 ```
-======================== 6 passed in 0.6s ========================
+======================== 7 passed in 0.6s ========================
 ```
 
 If any of this fails, stop and read `docs/TROUBLESHOOTING.md`. Do not move on until the local mock mode works.
 
 **Wait time so far**: ~5 minutes. **Cost so far**: ₩0.
+
+---
+
+## Fast path — Deploy with the provided scripts
+
+Use this path for the official demo or for tutor-led practice. It performs the same Azure steps as the manual walkthrough, but keeps names consistent and records a small state file under `.azure/`.
+
+Set a suffix first. Keep it lowercase, 3-19 characters, and unique per team or demo run:
+
+```bash
+export SUFFIX=cvbot01
+export LOCATION=koreacentral
+```
+
+Resource names created by the scripts:
+
+| Resource | Name pattern |
+|---|---|
+| Resource group | `rg-cvbot-$SUFFIX` |
+| Azure OpenAI | `oai-cvbot-$SUFFIX` |
+| Azure Container Registry | `acrcvbot$SUFFIX` without hyphens |
+| Container Apps Environment | `cae-cvbot-$SUFFIX` |
+| Container App | `ca-cvbot-$SUFFIX` |
+
+Deploy:
+
+```bash
+bash scripts/deploy_career_cv_aca.sh
+```
+
+The script signs in with `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, and `AZURE_TENANT_ID` if they are present. Otherwise it uses your existing `az login` session. It registers providers, creates or reuses Azure resources, builds the container in ACR, deploys the app with `--min-replicas 0`, calls `/health`, then sends exactly one sample `/review` request.
+
+Verify again later:
+
+```bash
+bash scripts/verify_career_cv_aca.sh
+```
+
+Stop the public app URL after a demo while keeping the resource group:
+
+```bash
+bash scripts/stop_career_cv_aca.sh
+```
+
+Delete everything for the suffix:
+
+```bash
+bash scripts/delete_career_cv_aca.sh
+```
+
+The deploy script writes `.azure/career-cv-demo-$SUFFIX.env` with non-secret values such as `APP_URL` and `RESOURCE_GROUP`. It does not write the Azure OpenAI key.
+
+### GitHub Actions path
+
+The same script set can run in GitHub Actions. Repository maintainers must set these four repository secrets first:
+
+```text
+AZURE_TENANT_ID
+AZURE_SUBSCRIPTION_ID
+AZURE_CLIENT_ID
+AZURE_CLIENT_SECRET
+```
+
+Then run:
+
+```bash
+gh workflow run career-cv-demo.yml \
+  --ref example/career-cv \
+  -f operation=deploy \
+  -f suffix=cvbot01 \
+  -f location=koreacentral
+```
+
+Other supported operations are `verify`, `stop`, and `delete`:
+
+```bash
+gh workflow run career-cv-demo.yml --ref example/career-cv -f operation=verify -f suffix=cvbot01 -f location=koreacentral
+gh workflow run career-cv-demo.yml --ref example/career-cv -f operation=stop   -f suffix=cvbot01 -f location=koreacentral
+gh workflow run career-cv-demo.yml --ref example/career-cv -f operation=delete -f suffix=cvbot01 -f location=koreacentral
+```
+
+Watch the run in the GitHub Actions tab. The KOICA-TIU Azure Admin console uses this same workflow and shows the run status, step progress, resource group state, Container App state, and public URL in one page.
 
 ---
 

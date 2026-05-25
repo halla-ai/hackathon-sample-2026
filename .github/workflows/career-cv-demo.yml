@@ -1,0 +1,102 @@
+name: Career CV Demo
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: "Operation to run"
+        required: true
+        default: "deploy"
+        type: choice
+        options:
+          - deploy
+          - verify
+          - stop
+          - delete
+      suffix:
+        description: "Lowercase suffix used for Azure resource names"
+        required: true
+        default: "demo"
+        type: string
+      location:
+        description: "Azure region"
+        required: true
+        default: "koreacentral"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  career-cv-demo:
+    name: Career CV demo ${{ inputs.operation }}
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+      SUFFIX: ${{ inputs.suffix }}
+      LOCATION: ${{ inputs.location }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Validate inputs
+        run: |
+          case "${{ inputs.operation }}" in
+            deploy|verify|stop|delete) ;;
+            *) echo "Unsupported operation: ${{ inputs.operation }}" >&2; exit 2 ;;
+          esac
+          [[ "$SUFFIX" =~ ^[a-z0-9][a-z0-9-]{1,17}[a-z0-9]$ ]] || {
+            echo "Invalid suffix: $SUFFIX" >&2
+            exit 2
+          }
+
+      - name: Set up Python
+        if: ${{ inputs.operation == 'deploy' }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Run tests before deploy
+        if: ${{ inputs.operation == 'deploy' }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pytest tests/
+
+      - name: Run deploy
+        if: ${{ inputs.operation == 'deploy' }}
+        run: bash scripts/deploy_career_cv_aca.sh
+
+      - name: Run verify
+        if: ${{ inputs.operation == 'verify' }}
+        run: bash scripts/verify_career_cv_aca.sh
+
+      - name: Run stop
+        if: ${{ inputs.operation == 'stop' }}
+        run: bash scripts/stop_career_cv_aca.sh
+
+      - name: Run delete
+        if: ${{ inputs.operation == 'delete' }}
+        run: bash scripts/delete_career_cv_aca.sh
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## Career CV demo"
+            echo
+            echo "- Operation: \`${{ inputs.operation }}\`"
+            echo "- Suffix: \`$SUFFIX\`"
+            echo "- Location: \`$LOCATION\`"
+            echo "- Resource group: \`rg-cvbot-$SUFFIX\`"
+            if [[ -f ".azure/career-cv-demo-$SUFFIX.env" ]]; then
+              echo
+              echo "### State"
+              sed 's/^/- /' ".azure/career-cv-demo-$SUFFIX.env"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
