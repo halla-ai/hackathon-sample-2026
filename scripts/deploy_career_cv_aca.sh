@@ -35,9 +35,11 @@ else
 fi
 
 log "Ensuring model deployment"
+MODEL_SKU_NAME="$(detect_model_sku)"
 if resource_exists az cognitiveservices account deployment show --resource-group "$RG" --name "$OPENAI_NAME" --deployment-name "$DEPLOYMENT_NAME"; then
   echo "Model deployment exists: $DEPLOYMENT_NAME"
 else
+  echo "Using model SKU: $MODEL_SKU_NAME"
   run az cognitiveservices account deployment create \
     --resource-group "$RG" \
     --name "$OPENAI_NAME" \
@@ -46,7 +48,7 @@ else
     --model-version "$MODEL_VERSION" \
     --model-format OpenAI \
     --sku-capacity 10 \
-    --sku-name Standard
+    --sku-name "$MODEL_SKU_NAME"
 fi
 
 log "Ensuring Azure Container Registry"

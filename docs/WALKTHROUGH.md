@@ -239,6 +239,7 @@ ENV_NAME=cae-$SUFFIX
 DEPLOYMENT_NAME=gpt-4o-mini
 MODEL_NAME=gpt-4o-mini
 MODEL_VERSION=2024-07-18
+MODEL_SKU_NAME=GlobalStandard          # koreacentral; many other regions use Standard
 
 # 3a. Register the providers (idempotent — safe to re-run)
 az provider register --namespace Microsoft.App --wait
@@ -266,7 +267,7 @@ az cognitiveservices account deployment create \
   --model-version $MODEL_VERSION \
   --model-format OpenAI \
   --sku-capacity 10 \
-  --sku-name "Standard"
+  --sku-name "$MODEL_SKU_NAME"
 
 # 3d. Container Registry (Basic SKU — cheapest)
 az acr create \
@@ -299,7 +300,7 @@ echo "Endpoint: $ENDPOINT"
 echo "Key:      ${API_KEY:0:8}…"   # only show prefix
 ```
 
-> **gpt-4o-mini region**: `koreacentral` has this model as of 2026. If `az cognitiveservices account deployment create` fails with "Model not available in this region", switch `LOCATION` to `eastus` or `swedencentral` and re-run from 3b. See [Troubleshooting #1](#troubleshooting).
+> **gpt-4o-mini region/SKU**: in this KOICA-TIU subscription, `koreacentral` exposes `gpt-4o-mini` through `GlobalStandard`. Many other regions use `Standard`. The provided deploy script detects this automatically; if you are following the manual commands, set `MODEL_SKU_NAME` to the SKU shown by `az cognitiveservices model list -l $LOCATION`.
 
 **Wait time**: ~6 minutes. **Cost so far**: ₩0 (resources are created but idle).
 
@@ -485,9 +486,23 @@ Note: scale-to-zero already prevents most idle cost. The deactivate command is o
 
 ## Troubleshooting
 
-### 1. `gpt-4o-mini` not available in `koreacentral`
+### 1. `gpt-4o-mini` deployment fails with `SpecialFeatureOrQuotaIdRequired`
 
-Azure OpenAI model availability rotates per region. As of 2026 most regions support `gpt-4o-mini`, but if your deployment create fails, switch to one of:
+First check the SKU exposed in your region:
+
+```bash
+az cognitiveservices model list -l $LOCATION \
+  --query "[?model.name=='gpt-4o-mini'].[model.name,model.version,model.skus[0].name]" \
+  -o table
+```
+
+If the SKU is `GlobalStandard`, set:
+
+```bash
+MODEL_SKU_NAME=GlobalStandard
+```
+
+If the model is not listed at all, switch to one of:
 
 - `eastus`
 - `swedencentral`

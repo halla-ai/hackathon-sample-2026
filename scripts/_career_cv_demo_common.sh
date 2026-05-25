@@ -7,6 +7,7 @@ SUFFIX="${SUFFIX:-demo}"
 DEPLOYMENT_NAME="${DEPLOYMENT_NAME:-gpt-4o-mini}"
 MODEL_NAME="${MODEL_NAME:-gpt-4o-mini}"
 MODEL_VERSION="${MODEL_VERSION:-2024-07-18}"
+MODEL_SKU_NAME="${MODEL_SKU_NAME:-}"
 API_VERSION="${AZURE_OPENAI_API_VERSION:-2024-12-01-preview}"
 SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID:-$DEFAULT_SUBSCRIPTION_ID}"
 
@@ -61,6 +62,27 @@ resource_exists() {
   "$@" >/dev/null 2>&1
 }
 
+detect_model_sku() {
+  if [[ -n "$MODEL_SKU_NAME" ]]; then
+    echo "$MODEL_SKU_NAME"
+    return
+  fi
+
+  local detected
+  detected="$(az cognitiveservices model list \
+    --location "$LOCATION" \
+    --query "[?model.name=='${MODEL_NAME}' && model.version=='${MODEL_VERSION}'].model.skus[0].name | [0]" \
+    -o tsv)"
+
+  if [[ -z "$detected" || "$detected" == "None" ]]; then
+    echo "Unable to auto-detect SKU for $MODEL_NAME $MODEL_VERSION in $LOCATION." >&2
+    echo "Set MODEL_SKU_NAME=Standard or MODEL_SKU_NAME=GlobalStandard and re-run." >&2
+    exit 2
+  fi
+
+  echo "$detected"
+}
+
 write_state() {
   mkdir -p "$STATE_DIR"
   {
@@ -74,6 +96,7 @@ write_state() {
     printf 'DEPLOYMENT_NAME=%s\n' "$DEPLOYMENT_NAME"
     printf 'MODEL_NAME=%s\n' "$MODEL_NAME"
     printf 'MODEL_VERSION=%s\n' "$MODEL_VERSION"
+    printf 'MODEL_SKU_NAME=%s\n' "$MODEL_SKU_NAME"
     printf 'AZURE_OPENAI_API_VERSION=%s\n' "$API_VERSION"
     if [[ -n "${FQDN:-}" ]]; then
       printf 'FQDN=%s\n' "$FQDN"
