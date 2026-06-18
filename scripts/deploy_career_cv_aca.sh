@@ -15,10 +15,14 @@ run az provider register --namespace Microsoft.CognitiveServices --wait
 run az provider register --namespace Microsoft.OperationalInsights --wait
 
 log "Ensuring resource group"
-run az group create \
-  --name "$RG" \
-  --location "$LOCATION" \
-  --tags purpose=career-cv-demo owner=koica-tiu cost-control=scale-to-zero delete-after=2026-06-21 suffix="$SUFFIX"
+if resource_exists az group show --name "$RG"; then
+  echo "Resource group exists: $RG (using as-is; e.g. a pre-provisioned team RG)"
+else
+  run az group create \
+    --name "$RG" \
+    --location "$LOCATION" \
+    --tags purpose=career-cv-demo owner=koica-tiu cost-control=scale-to-zero delete-after=2026-06-21 suffix="$SUFFIX"
+fi
 
 log "Ensuring Azure OpenAI resource"
 if resource_exists az cognitiveservices account show --name "$OPENAI_NAME" --resource-group "$RG"; then

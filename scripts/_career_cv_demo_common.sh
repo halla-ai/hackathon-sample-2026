@@ -22,7 +22,12 @@ if [[ ${#ACR_SUFFIX} -lt 3 || ${#ACR_SUFFIX} -gt 18 ]]; then
   exit 2
 fi
 
-RG="rg-cvbot-${SUFFIX}"
+# Resource group: defaults to a per-suffix RG the script creates. Set
+# RESOURCE_GROUP to deploy into a pre-provisioned group instead (e.g. a
+# KOICA-TIU team RG like rg-koicatiu-team01, where students hold Contributor but
+# cannot create new RGs). When RESOURCE_GROUP points at an existing group, the
+# deploy script uses it as-is and does not run `az group create`.
+RG="${RESOURCE_GROUP:-rg-cvbot-${SUFFIX}}"
 OPENAI_NAME="oai-cvbot-${SUFFIX}"
 ACR_NAME="acrcvbot${ACR_SUFFIX}"
 APP_NAME="ca-cvbot-${SUFFIX}"
