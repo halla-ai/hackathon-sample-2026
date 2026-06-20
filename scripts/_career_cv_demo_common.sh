@@ -130,6 +130,10 @@ dump_app_diagnostics() {
   local rev
   rev="$(latest_revision)"
   echo "===== Diagnostics for $APP_NAME (rev: ${rev:-?}) =====" >&2
+  echo "--- ingress / revision mode ---" >&2
+  az containerapp show --name "$APP_NAME" --resource-group "$RG" \
+    --query '{activeRevisionsMode:properties.configuration.activeRevisionsMode,targetPort:properties.configuration.ingress.targetPort,external:properties.configuration.ingress.external,traffic:properties.configuration.ingress.traffic}' \
+    -o json >&2 2>&1 || true
   az containerapp revision show --name "$APP_NAME" --resource-group "$RG" --revision "$rev" \
     --query '{runningState:properties.runningState,healthState:properties.healthState,active:properties.active,replicas:properties.replicas,provisioningError:properties.provisioningError}' \
     -o json >&2 2>&1 || true

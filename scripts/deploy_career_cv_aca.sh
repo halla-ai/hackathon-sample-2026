@@ -99,9 +99,10 @@ IMAGE="$ACR_LOGIN/$IMAGE_NAME"
 
 # Force a fresh, active revision on every deploy. A prior `stop` deactivates the
 # revision (active:false / runningState:Stopped); reusing it (an identical image
-# rebuild reuses the same revision) leaves the app serving 404, and merely
-# re-activating that revision does not restore it. A new revision suffix always
-# yields an active, 100%-traffic revision.
+# rebuild reuses the same revision) leaves the app serving 404. We also run the
+# app at min-replicas 1 so a replica is always running and routable — scale-to-
+# zero activation was not bringing the revision up, leaving it Stopped. (The
+# `stop` operation scales it back down for cost when the demo is idle.)
 REVISION_SUFFIX="d$(date -u +%Y%m%d%H%M%S)"
 
 log "Creating or updating Container App"
@@ -123,7 +124,7 @@ if resource_exists az containerapp show --name "$APP_NAME" --resource-group "$RG
     --resource-group "$RG" \
     --image "$IMAGE" \
     --revision-suffix "$REVISION_SUFFIX" \
-    --min-replicas 0 \
+    --min-replicas 1 \
     --max-replicas 1 \
     --cpu 0.5 \
     --memory 1.0Gi \
@@ -141,7 +142,7 @@ else
     --revision-suffix "$REVISION_SUFFIX" \
     --target-port 8000 \
     --ingress external \
-    --min-replicas 0 \
+    --min-replicas 1 \
     --max-replicas 1 \
     --cpu 0.5 \
     --memory 1.0Gi \
@@ -156,6 +157,14 @@ else
     --secrets azure-openai-key="$API_KEY" \
     --tags purpose=career-cv-demo owner=koica-tiu cost-control=scale-to-zero delete-after=2026-06-21 suffix="$SUFFIX"
 fi
+
+# Route 100% of ingress traffic to the latest revision. A prior stop/deactivate
+# can leave traffic pinned to an old (now inactive) revision, so the ingress
+# 404s every request even though a new revision is active.
+run az containerapp ingress traffic set \
+  --name "$APP_NAME" \
+  --resource-group "$RG" \
+  --revision-weight latest=100 || true
 
 FQDN="$(get_fqdn)"
 write_state
