@@ -150,8 +150,7 @@ FQDN="$(get_fqdn)"
 write_state
 
 log "Verifying deployed app"
-curl -fsS "https://$FQDN/health"
-printf '\n'
+wait_for_health "$FQDN"
 curl -fsS -X POST "https://$FQDN/review" \
   -H "Content-Type: application/json" \
   -d "$(sample_cv_json)"

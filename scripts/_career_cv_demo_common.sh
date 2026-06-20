@@ -119,6 +119,32 @@ get_fqdn() {
     -o tsv
 }
 
+# Poll the app's /health until it returns 200. A freshly created (or scaled-to-
+# zero) Container App revision is not routable instantly — the ingress returns
+# 404 until the first revision is active/healthy — so verifying with a single
+# immediate curl races the activation. On timeout, dump revision state + logs so
+# a genuine startup failure is visible rather than silent.
+wait_for_health() {
+  local fqdn="$1" attempts="${2:-40}" delay="${3:-6}" code
+  log "Waiting for https://${fqdn}/health (up to $((attempts * delay))s)"
+  for ((i = 1; i <= attempts; i++)); do
+    code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "https://${fqdn}/health" || echo 000)"
+    if [[ "$code" == "200" ]]; then
+      echo "Healthy after ~$((i * delay))s (HTTP 200)"
+      return 0
+    fi
+    echo "  attempt ${i}/${attempts}: HTTP ${code} — retrying in ${delay}s"
+    sleep "$delay"
+  done
+  echo "App did not become healthy at https://${fqdn}/health after $((attempts * delay))s" >&2
+  echo "Diagnostics (best-effort):" >&2
+  az containerapp show --name "$APP_NAME" --resource-group "$RG" \
+    --query '{provisioningState:properties.provisioningState,latestRevision:properties.latestRevisionName,fqdn:properties.configuration.ingress.fqdn}' \
+    -o json >&2 || true
+  az containerapp logs show --name "$APP_NAME" --resource-group "$RG" --tail 50 >&2 2>&1 || true
+  return 1
+}
+
 sample_cv_json() {
   cat <<'JSON'
 {"cv":"Aisha Karimova\nTashkent International University, BSc in Computer Science (2024-). Project: Campus FAQ Bot using Python, FastAPI, and Azure OpenAI. Evaluated 100 sample questions and reached 80 percent answer accuracy. Skills: Python, Git, basic React."}

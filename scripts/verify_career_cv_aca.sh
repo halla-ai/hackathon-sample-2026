@@ -17,8 +17,7 @@ FQDN="$(get_fqdn)"
 write_state
 
 log "Health check"
-curl -fsS "https://$FQDN/health"
-printf '\n'
+wait_for_health "$FQDN"
 
 log "One live review check"
 curl -fsS -X POST "https://$FQDN/review" \
