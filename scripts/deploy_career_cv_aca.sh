@@ -146,6 +146,24 @@ else
     --tags purpose=career-cv-demo owner=koica-tiu cost-control=scale-to-zero delete-after=2026-06-21 suffix="$SUFFIX"
 fi
 
+# A prior `stop` deactivates the revision (revision deactivate → active:false,
+# runningState:Stopped). When the rebuilt image is identical, `containerapp
+# update` reuses that same deactivated revision and never brings it back up, so
+# the ingress serves 404. Re-activate the latest revision so deploy always
+# leaves the app serving (the reverse of stop_career_cv_aca.sh).
+log "Ensuring the latest revision is active"
+LATEST_REV="$(latest_revision)"
+if [[ -n "$LATEST_REV" ]]; then
+  IS_ACTIVE="$(az containerapp revision show --name "$APP_NAME" --resource-group "$RG" \
+    --revision "$LATEST_REV" --query properties.active -o tsv 2>/dev/null || echo "")"
+  if [[ "$IS_ACTIVE" == "true" ]]; then
+    echo "Latest revision $LATEST_REV is already active."
+  else
+    echo "Latest revision $LATEST_REV is inactive (active=${IS_ACTIVE:-?}) — activating."
+    run az containerapp revision activate --name "$APP_NAME" --resource-group "$RG" --revision "$LATEST_REV"
+  fi
+fi
+
 FQDN="$(get_fqdn)"
 write_state
 
