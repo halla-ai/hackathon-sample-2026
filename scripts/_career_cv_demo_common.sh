@@ -119,13 +119,36 @@ get_fqdn() {
     -o tsv
 }
 
+latest_revision() {
+  az containerapp show --name "$APP_NAME" --resource-group "$RG" \
+    --query properties.latestRevisionName -o tsv 2>/dev/null || echo ""
+}
+
+# Dump why the app isn't serving: revision running/health state, replica
+# container states (crash/exit reasons), and system + console logs.
+dump_app_diagnostics() {
+  local rev
+  rev="$(latest_revision)"
+  echo "===== Diagnostics for $APP_NAME (rev: ${rev:-?}) =====" >&2
+  az containerapp revision show --name "$APP_NAME" --resource-group "$RG" --revision "$rev" \
+    --query '{runningState:properties.runningState,healthState:properties.healthState,active:properties.active,replicas:properties.replicas,provisioningError:properties.provisioningError}' \
+    -o json >&2 2>&1 || true
+  echo "--- replicas (container states / termination reasons) ---" >&2
+  az containerapp replica list --name "$APP_NAME" --resource-group "$RG" --revision "$rev" -o json >&2 2>&1 || true
+  echo "--- system logs (tail 80) ---" >&2
+  az containerapp logs show --name "$APP_NAME" --resource-group "$RG" --type system --tail 80 >&2 2>&1 || true
+  echo "--- console logs (tail 80) ---" >&2
+  az containerapp logs show --name "$APP_NAME" --resource-group "$RG" --type console --tail 80 >&2 2>&1 || true
+}
+
 # Poll the app's /health until it returns 200. A freshly created (or scaled-to-
 # zero) Container App revision is not routable instantly — the ingress returns
 # 404 until the first revision is active/healthy — so verifying with a single
-# immediate curl races the activation. On timeout, dump revision state + logs so
-# a genuine startup failure is visible rather than silent.
+# immediate curl races the activation. Fail fast if the revision has clearly
+# failed to start, and on any failure dump diagnostics so a real startup crash
+# is visible rather than silent.
 wait_for_health() {
-  local fqdn="$1" attempts="${2:-40}" delay="${3:-6}" code
+  local fqdn="$1" attempts="${2:-40}" delay="${3:-6}" code rstate
   log "Waiting for https://${fqdn}/health (up to $((attempts * delay))s)"
   for ((i = 1; i <= attempts; i++)); do
     code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "https://${fqdn}/health" || echo 000)"
@@ -133,15 +156,22 @@ wait_for_health() {
       echo "Healthy after ~$((i * delay))s (HTTP 200)"
       return 0
     fi
-    echo "  attempt ${i}/${attempts}: HTTP ${code} — retrying in ${delay}s"
+    if (( i % 5 == 0 )); then
+      rstate="$(az containerapp revision show --name "$APP_NAME" --resource-group "$RG" \
+        --revision "$(latest_revision)" --query properties.runningState -o tsv 2>/dev/null || echo '')"
+      echo "  attempt ${i}/${attempts}: HTTP ${code}, revision runningState=${rstate:-?}"
+      if [[ "$rstate" == "Failed" ]]; then
+        echo "Latest revision runningState=Failed — not waiting further." >&2
+        dump_app_diagnostics
+        return 1
+      fi
+    else
+      echo "  attempt ${i}/${attempts}: HTTP ${code} — retrying in ${delay}s"
+    fi
     sleep "$delay"
   done
   echo "App did not become healthy at https://${fqdn}/health after $((attempts * delay))s" >&2
-  echo "Diagnostics (best-effort):" >&2
-  az containerapp show --name "$APP_NAME" --resource-group "$RG" \
-    --query '{provisioningState:properties.provisioningState,latestRevision:properties.latestRevisionName,fqdn:properties.configuration.ingress.fqdn}' \
-    -o json >&2 || true
-  az containerapp logs show --name "$APP_NAME" --resource-group "$RG" --tail 50 >&2 2>&1 || true
+  dump_app_diagnostics
   return 1
 }
 
