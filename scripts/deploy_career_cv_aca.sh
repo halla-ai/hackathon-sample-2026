@@ -97,18 +97,30 @@ ACR_LOGIN="$(az acr show --name "$ACR_NAME" --resource-group "$RG" --query login
 ACR_PASSWORD="$(az acr credential show --name "$ACR_NAME" --query 'passwords[0].value' -o tsv)"
 IMAGE="$ACR_LOGIN/$IMAGE_NAME"
 
-# Force a fresh, active revision on every deploy. A prior `stop` deactivates the
-# revision (active:false / runningState:Stopped); reusing it (an identical image
-# rebuild reuses the same revision) leaves the app serving 404. We also run the
-# app at min-replicas 1 so a replica is always running and routable — scale-to-
-# zero activation was not bringing the revision up, leaving it Stopped. (The
-# `stop` operation scales it back down for cost when the demo is idle.)
+# Root cause of the deploy 404: a prior `stop` (revision deactivate) can leave
+# the whole app at runningStatus=Stopped, which schedules 0 replicas regardless
+# of revision/scale/traffic config, so the ingress 404s every request. This
+# Azure CLI build has no `az containerapp start`, and update/activate/traffic do
+# NOT restart a stopped app — so if the app isn't Running we delete and recreate
+# it (a freshly created app is always Running). A unique revision suffix + min-
+# replicas 1 then keep a replica running and routable for the demo (a later
+# `stop` deactivates it again for cost).
 REVISION_SUFFIX="d$(date -u +%Y%m%d%H%M%S)"
 
 log "Creating or updating Container App"
+APP_PRESENT=false
 if resource_exists az containerapp show --name "$APP_NAME" --resource-group "$RG"; then
-  # Un-stop the app if a prior stop left it app-level stopped (no-op otherwise).
-  run az containerapp start --name "$APP_NAME" --resource-group "$RG" || true
+  APP_PRESENT=true
+  RUNNING_STATUS="$(az containerapp show --name "$APP_NAME" --resource-group "$RG" \
+    --query properties.runningStatus -o tsv 2>/dev/null || echo "")"
+  if [[ "$RUNNING_STATUS" != "Running" ]]; then
+    echo "App $APP_NAME runningStatus='${RUNNING_STATUS:-unknown}' (not Running, e.g. after a stop) — deleting and recreating it fresh."
+    run az containerapp delete --name "$APP_NAME" --resource-group "$RG" --yes
+    APP_PRESENT=false
+  fi
+fi
+
+if [[ "$APP_PRESENT" == "true" ]]; then
   run az containerapp secret set \
     --name "$APP_NAME" \
     --resource-group "$RG" \
