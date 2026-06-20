@@ -97,8 +97,17 @@ ACR_LOGIN="$(az acr show --name "$ACR_NAME" --resource-group "$RG" --query login
 ACR_PASSWORD="$(az acr credential show --name "$ACR_NAME" --query 'passwords[0].value' -o tsv)"
 IMAGE="$ACR_LOGIN/$IMAGE_NAME"
 
+# Force a fresh, active revision on every deploy. A prior `stop` deactivates the
+# revision (active:false / runningState:Stopped); reusing it (an identical image
+# rebuild reuses the same revision) leaves the app serving 404, and merely
+# re-activating that revision does not restore it. A new revision suffix always
+# yields an active, 100%-traffic revision.
+REVISION_SUFFIX="d$(date -u +%Y%m%d%H%M%S)"
+
 log "Creating or updating Container App"
 if resource_exists az containerapp show --name "$APP_NAME" --resource-group "$RG"; then
+  # Un-stop the app if a prior stop left it app-level stopped (no-op otherwise).
+  run az containerapp start --name "$APP_NAME" --resource-group "$RG" || true
   run az containerapp secret set \
     --name "$APP_NAME" \
     --resource-group "$RG" \
@@ -113,6 +122,7 @@ if resource_exists az containerapp show --name "$APP_NAME" --resource-group "$RG
     --name "$APP_NAME" \
     --resource-group "$RG" \
     --image "$IMAGE" \
+    --revision-suffix "$REVISION_SUFFIX" \
     --min-replicas 0 \
     --max-replicas 1 \
     --cpu 0.5 \
@@ -128,6 +138,7 @@ else
     --resource-group "$RG" \
     --environment "$ENV_NAME" \
     --image "$IMAGE" \
+    --revision-suffix "$REVISION_SUFFIX" \
     --target-port 8000 \
     --ingress external \
     --min-replicas 0 \
@@ -144,24 +155,6 @@ else
       AZURE_OPENAI_API_VERSION="$API_VERSION" \
     --secrets azure-openai-key="$API_KEY" \
     --tags purpose=career-cv-demo owner=koica-tiu cost-control=scale-to-zero delete-after=2026-06-21 suffix="$SUFFIX"
-fi
-
-# A prior `stop` deactivates the revision (revision deactivate → active:false,
-# runningState:Stopped). When the rebuilt image is identical, `containerapp
-# update` reuses that same deactivated revision and never brings it back up, so
-# the ingress serves 404. Re-activate the latest revision so deploy always
-# leaves the app serving (the reverse of stop_career_cv_aca.sh).
-log "Ensuring the latest revision is active"
-LATEST_REV="$(latest_revision)"
-if [[ -n "$LATEST_REV" ]]; then
-  IS_ACTIVE="$(az containerapp revision show --name "$APP_NAME" --resource-group "$RG" \
-    --revision "$LATEST_REV" --query properties.active -o tsv 2>/dev/null || echo "")"
-  if [[ "$IS_ACTIVE" == "true" ]]; then
-    echo "Latest revision $LATEST_REV is already active."
-  else
-    echo "Latest revision $LATEST_REV is inactive (active=${IS_ACTIVE:-?}) — activating."
-    run az containerapp revision activate --name "$APP_NAME" --resource-group "$RG" --revision "$LATEST_REV"
-  fi
 fi
 
 FQDN="$(get_fqdn)"
